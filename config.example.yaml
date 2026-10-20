@@ -1,0 +1,25 @@
+# Example inferline configuration.
+# Copy to config.yaml and edit, or use INFERLINE_* environment variables.
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+
+scheduler:
+  max_tokens_per_batch: 2048  # token budget per micro-batch
+  max_wait_ms: 20             # coalescing window before dispatch
+  max_queue_depth: 1024       # beyond this -> HTTP 503
+
+rate_limit:
+  enabled: true
+  requests_per_second: 10.0
+  burst: 20
+
+mock:
+  latency_per_token_ms: 5.0   # simulated decode latency (no GPU needed)
+  vocab_size: 512
+
+model_name: "inferline-mock-1b"
+
+# Accepted Bearer API keys. Empty = auth disabled (local dev).
+api_keys: []
