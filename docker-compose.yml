@@ -1,0 +1,17 @@
+services:
+  inferline:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # Uncomment to require API keys:
+      # INFERLINE_API_KEYS: "dev-key-1,dev-key-2"
+      INFERLINE_SERVER__PORT: "8000"
+      INFERLINE_SCHEDULER__MAX_TOKENS_PER_BATCH: "2048"
+      INFERLINE_MOCK__LATENCY_PER_TOKEN_MS: "5.0"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
