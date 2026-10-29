@@ -40,6 +40,14 @@ def test_limiter_disabled_allows_everything():
         assert limiter.allow("alice")
 
 
+def test_bucket_multi_token_cost():
+    bucket = TokenBucket(rate=1.0, capacity=3)
+    assert bucket.allow(cost=2)
+    assert not bucket.allow(cost=2)
+    assert bucket.allow(cost=1)
+    assert not bucket.allow()
+
+
 def test_invalid_parameters():
     import pytest
 
