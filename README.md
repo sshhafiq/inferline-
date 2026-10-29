@@ -86,6 +86,12 @@ Configuration: copy `config.example.yaml` to `config.yaml`, or use environment
 variables (`INFERLINE_SCHEDULER__MAX_TOKENS_PER_BATCH=4096`,
 `INFERLINE_API_KEYS="key1,key2"`).
 
+Authentication: when no API keys are configured, auth is disabled and
+every request is accepted (the default for local development). Set
+`INFERLINE_API_KEYS` to a comma-separated list of keys to require a
+`Authorization: Bearer <key>` header; requests with a missing or unknown
+key are rejected with 401.
+
 Docker:
 
 ```bash
