@@ -12,8 +12,8 @@ scheduler:
 
 rate_limit:
   enabled: true
-  requests_per_second: 10.0
-  burst: 20
+  requests_per_second: 10.0  # sustained refill rate per API key
+  burst: 20                   # bucket capacity: max requests in one burst
 
 mock:
   latency_per_token_ms: 5.0   # simulated decode latency (no GPU needed)
