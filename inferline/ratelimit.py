@@ -59,12 +59,16 @@ class RateLimiter:
         self._buckets: dict[str, TokenBucket] = {}
         self._lock = threading.Lock()
 
-    def allow(self, key: str) -> bool:
-        """Return True if ``key`` may proceed right now."""
+    def allow(self, key: str, cost: int = 1) -> bool:
+        """Return True if ``key`` may proceed right now.
+
+        ``cost`` is passed through to the key's bucket, so expensive
+        requests (e.g. long generations) can consume more than one token.
+        """
         if not self.enabled:
             return True
         bucket = self._bucket_for(key)
-        return bucket.allow()
+        return bucket.allow(cost=cost)
 
     def _bucket_for(self, key: str) -> TokenBucket:
         with self._lock:
