@@ -108,6 +108,15 @@ async def test_generate_on_closed_scheduler_raises():
         await sched.generate(make_request("too late"))
 
 
+async def test_stream_on_closed_scheduler_raises():
+    sched = Scheduler(MockBackend(), BatchingPolicy())
+    await sched.start()
+    await sched.aclose()
+    with pytest.raises(RuntimeError):
+        async for _ in sched.stream(make_request("too late")):
+            pass
+
+
 async def test_transformers_stub_raises_helpfully():
     stub = TransformersBackend()
     with pytest.raises(NotImplementedError, match="documented stub"):
