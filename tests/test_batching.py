@@ -63,6 +63,13 @@ def test_does_not_mutate_queue():
     assert len(queue) == 1
 
 
+def test_max_batch_requests_caps_batch():
+    policy = BatchingPolicy(max_tokens_per_batch=1000, max_batch_requests=2)
+    queue = [make_request(f"r{i}") for i in range(5)]
+    batch = policy.form_batch(queue)
+    assert [r.request_id for r in batch] == ["r0", "r1"]
+
+
 def test_invalid_policy_rejected():
     with pytest.raises(ValueError):
         BatchingPolicy(max_tokens_per_batch=0)
