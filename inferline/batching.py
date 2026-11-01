@@ -57,6 +57,10 @@ class BatchingPolicy:
         """Order waiting requests: priority lane first, then FIFO."""
         return sorted(queue, key=lambda r: (-r.priority.value, r.arrival_time))
 
+    def batch_tokens(self, batch: list[QueuedRequest]) -> int:
+        """Total worst-case tokens a formed batch occupies."""
+        return sum(request.token_cost for request in batch)
+
     def form_batch(self, queue: list[QueuedRequest]) -> list[QueuedRequest]:
         """Greedily pack the highest-priority requests into one micro-batch.
 
