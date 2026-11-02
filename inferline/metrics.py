@@ -97,6 +97,18 @@ class Histogram:
             self._counts[-1] += 1  # the +Inf bucket always counts
             self._sum += value
 
+    def count(self) -> int:
+        """Total number of observations recorded so far."""
+        with self._lock:
+            return self._counts[-1]
+
+    def mean(self) -> float:
+        """Mean of the observed values, or 0.0 before any observation."""
+        with self._lock:
+            if self._counts[-1] == 0:
+                return 0.0
+            return self._sum / self._counts[-1]
+
     def render(self, out: list[str]) -> None:
         out.append(f"# HELP {self.name} {self.documentation}")
         out.append(f"# TYPE {self.name} histogram")
