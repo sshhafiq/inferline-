@@ -205,6 +205,14 @@ class Scheduler:
     def queue_depth(self) -> int:
         return len(self._pending)
 
+    def pending_prompts(self) -> list[str]:
+        """Prompts currently waiting for a batch, in queue order.
+
+        Read-only observability for debugging stalls; it never mutates
+        the queue or dequeues a request.
+        """
+        return [inf.request.prompt for inf in self._pending]
+
     def _enqueue(self, request: GenerationRequest) -> _Inflight:
         if self._closed:
             raise RuntimeError("scheduler is closed")
