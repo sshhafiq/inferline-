@@ -128,3 +128,24 @@ def test_estimate_tokens():
     assert estimate_tokens("") == 1
     assert estimate_tokens("abcd") == 1
     assert estimate_tokens("a" * 40) == 10
+
+
+async def test_pending_prompts_lists_queued_requests():
+    backend = MockBackend(latency_per_token_ms=20)
+    policy = BatchingPolicy(max_tokens_per_batch=4096, max_wait_ms=50)
+    sched = Scheduler(backend=backend, policy=policy)
+    await sched.start()
+    try:
+        assert sched.pending_prompts() == []
+        # Occupy the backend with a long generation so the next request
+        # stays queued instead of being dispatched immediately.
+        first = asyncio.create_task(sched.generate(make_request("first", max_tokens=100)))
+        await asyncio.sleep(0.1)
+        second = asyncio.create_task(sched.generate(make_request("second", max_tokens=3)))
+        await asyncio.sleep(0.1)
+        assert sched.pending_prompts() == ["second"]
+        await first
+        await second
+        assert sched.pending_prompts() == []
+    finally:
+        await sched.aclose()
