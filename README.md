@@ -121,6 +121,11 @@ tens of milliseconds and the same scheduler sustains thousands of tok/s.
 Tune `max_tokens_per_batch` (KV-cache bound) and `max_wait_ms` (latency vs.
 batching efficiency) for your hardware.
 
+If requests look stalled, the scheduler exposes two read-only views of the
+waiting queue: `queue_depth` for the count and `pending_prompts()` for the
+queued prompts in order. Neither mutates the queue, so they are safe to poll
+from a debugger or a health endpoint while the loop is running.
+
 ## Project layout
 
 ```
