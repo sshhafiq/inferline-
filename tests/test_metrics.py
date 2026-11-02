@@ -49,3 +49,14 @@ def test_registry_renders_all_metrics():
     assert "inferline_queue_depth 4" in text
     assert "inferline_batch_size_count 1" in text
     assert text.endswith("\n")
+
+
+def test_counter_reset_drops_one_label_set():
+    c = Counter("reset_counter", "A test counter.")
+    c.inc(3, "a")
+    c.inc(1, "b")
+    c.reset("a")
+    assert c.get("a") == 0.0
+    assert c.get("b") == 1.0
+    c.reset("missing")
+    assert c.get("b") == 1.0
