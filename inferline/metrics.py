@@ -28,6 +28,11 @@ class Counter:
         with self._lock:
             return self._values.get(labels, 0.0)
 
+    def reset(self, *labels: str) -> None:
+        """Drop the stored value for one label set (a no-op if absent)."""
+        with self._lock:
+            self._values.pop(labels, None)
+
     def render(
         self, label_names: Iterable[str], out: list[str]
     ) -> None:
