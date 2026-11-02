@@ -38,6 +38,17 @@ def test_histogram_buckets_cumulative():
     assert "my_hist_count 3" in text
 
 
+def test_histogram_count_and_mean():
+    h = Histogram("my_hist2", "Another test histogram.", buckets=(1.0, 2.0))
+    assert h.count() == 0
+    assert h.mean() == 0.0
+    h.observe(0.5)
+    h.observe(1.5)
+    h.observe(5.0)
+    assert h.count() == 3
+    assert h.mean() == 7.0 / 3
+
+
 def test_registry_renders_all_metrics():
     reg = MetricsRegistry()
     reg.requests_total.inc(1, "chat_completions", "accepted")
