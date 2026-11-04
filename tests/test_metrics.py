@@ -82,3 +82,13 @@ def test_counter_reset_drops_one_label_set():
     assert c.get("b") == 1.0
     c.reset("missing")
     assert c.get("b") == 1.0
+
+
+def test_histogram_sum_tracks_observed_values():
+    h = Histogram("sum_hist", "Histogram for sum checks.", buckets=(1.0, 2.0))
+    assert h.sum() == 0.0
+    h.observe(0.5)
+    h.observe(1.5)
+    h.observe(5.0)
+    assert h.sum() == 7.0
+    assert h.sum() == h.mean() * h.count()
