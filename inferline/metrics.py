@@ -38,6 +38,11 @@ class Counter:
         with self._lock:
             return sum(self._values.values())
 
+    def label_set_count(self) -> int:
+        """Number of distinct label sets recorded so far."""
+        with self._lock:
+            return len(self._values)
+
     def render(
         self, label_names: Iterable[str], out: list[str]
     ) -> None:
