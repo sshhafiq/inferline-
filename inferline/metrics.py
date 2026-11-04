@@ -114,6 +114,11 @@ class Histogram:
                 return 0.0
             return self._sum / self._counts[-1]
 
+    def sum(self) -> float:
+        """Sum of the observed values, or 0.0 before any observation."""
+        with self._lock:
+            return self._sum
+
     def render(self, out: list[str]) -> None:
         out.append(f"# HELP {self.name} {self.documentation}")
         out.append(f"# TYPE {self.name} histogram")
