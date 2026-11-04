@@ -33,6 +33,11 @@ class Counter:
         with self._lock:
             self._values.pop(labels, None)
 
+    def total(self) -> float:
+        """Sum of this counter across every label set."""
+        with self._lock:
+            return sum(self._values.values())
+
     def render(
         self, label_names: Iterable[str], out: list[str]
     ) -> None:
