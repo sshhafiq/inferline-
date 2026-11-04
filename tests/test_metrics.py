@@ -62,6 +62,17 @@ def test_registry_renders_all_metrics():
     assert text.endswith("\n")
 
 
+def test_counter_total_sums_label_sets():
+    c = Counter("total_counter", "A test counter.")
+    assert c.total() == 0.0
+    c.inc(2, "a")
+    c.inc(3, "b")
+    c.inc(1, "a")
+    assert c.total() == 6.0
+    c.reset("b")
+    assert c.total() == 3.0
+
+
 def test_counter_reset_drops_one_label_set():
     c = Counter("reset_counter", "A test counter.")
     c.inc(3, "a")
