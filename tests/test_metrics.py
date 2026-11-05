@@ -84,6 +84,17 @@ def test_counter_reset_drops_one_label_set():
     assert c.get("b") == 1.0
 
 
+def test_counter_label_set_count():
+    c = Counter("label_counter", "A test counter.")
+    assert c.label_set_count() == 0
+    c.inc(2, "a")
+    c.inc(3, "b")
+    c.inc(1, "a")
+    assert c.label_set_count() == 2
+    c.reset("b")
+    assert c.label_set_count() == 1
+
+
 def test_histogram_sum_tracks_observed_values():
     h = Histogram("sum_hist", "Histogram for sum checks.", buckets=(1.0, 2.0))
     assert h.sum() == 0.0
