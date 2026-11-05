@@ -103,3 +103,17 @@ def test_histogram_sum_tracks_observed_values():
     h.observe(5.0)
     assert h.sum() == 7.0
     assert h.sum() == h.mean() * h.count()
+
+
+def test_gauge_reset_returns_to_zero():
+    g = Gauge("reset_gauge", "A test gauge.")
+    assert g.get() == 0.0
+    g.set(7)
+    g.inc(3)
+    assert g.get() == 10.0
+    g.reset()
+    assert g.get() == 0.0
+    g.dec(1)
+    assert g.get() == -1.0
+    g.reset()
+    assert g.get() == 0.0
