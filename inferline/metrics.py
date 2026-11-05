@@ -79,6 +79,11 @@ class Gauge:
         with self._lock:
             return self._value
 
+    def reset(self) -> None:
+        """Set the gauge back to 0.0."""
+        with self._lock:
+            self._value = 0.0
+
     def render(self, out: list[str]) -> None:
         out.append(f"# HELP {self.name} {self.documentation}")
         out.append(f"# TYPE {self.name} gauge")
