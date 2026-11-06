@@ -117,3 +117,17 @@ def test_gauge_reset_returns_to_zero():
     assert g.get() == -1.0
     g.reset()
     assert g.get() == 0.0
+
+
+def test_histogram_reset_clears_counts_and_sum():
+    h = Histogram("reset_hist", "Histogram for reset checks.", buckets=(1.0, 2.0))
+    h.observe(0.5)
+    h.observe(5.0)
+    assert h.count() == 2
+    h.reset()
+    assert h.count() == 0
+    assert h.sum() == 0.0
+    assert h.mean() == 0.0
+    h.observe(1.5)
+    assert h.count() == 1
+    assert h.sum() == 1.5
