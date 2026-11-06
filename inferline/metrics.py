@@ -129,6 +129,12 @@ class Histogram:
         with self._lock:
             return self._sum
 
+    def reset(self) -> None:
+        """Clear every bucket count and the running sum."""
+        with self._lock:
+            self._counts = [0] * (len(self.buckets) + 1)
+            self._sum = 0.0
+
     def render(self, out: list[str]) -> None:
         out.append(f"# HELP {self.name} {self.documentation}")
         out.append(f"# TYPE {self.name} histogram")
