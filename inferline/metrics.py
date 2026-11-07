@@ -43,6 +43,11 @@ class Counter:
         with self._lock:
             return len(self._values)
 
+    def max_value(self) -> float:
+        """Largest value across every label set, or 0.0 if none recorded."""
+        with self._lock:
+            return max(self._values.values(), default=0.0)
+
     def render(
         self, label_names: Iterable[str], out: list[str]
     ) -> None:
