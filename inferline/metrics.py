@@ -48,6 +48,11 @@ class Counter:
         with self._lock:
             return max(self._values.values(), default=0.0)
 
+    def min_value(self) -> float:
+        """Smallest value across every label set, or 0.0 if none recorded."""
+        with self._lock:
+            return min(self._values.values(), default=0.0)
+
     def render(
         self, label_names: Iterable[str], out: list[str]
     ) -> None:
