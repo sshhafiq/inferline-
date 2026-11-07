@@ -144,3 +144,16 @@ def test_counter_max_value_picks_largest_label_set():
     assert c.max_value() == 3.0
     c.reset("a")
     assert c.max_value() == 0.0
+
+
+def test_counter_min_value_picks_smallest_label_set():
+    c = Counter("min_counter", "A test counter.")
+    assert c.min_value() == 0.0
+    c.inc(2, "a")
+    c.inc(5, "b")
+    c.inc(1, "a")
+    assert c.min_value() == 3.0
+    c.reset("a")
+    assert c.min_value() == 5.0
+    c.reset("b")
+    assert c.min_value() == 0.0
