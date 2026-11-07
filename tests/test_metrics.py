@@ -131,3 +131,16 @@ def test_histogram_reset_clears_counts_and_sum():
     h.observe(1.5)
     assert h.count() == 1
     assert h.sum() == 1.5
+
+
+def test_counter_max_value_picks_largest_label_set():
+    c = Counter("max_counter", "A test counter.")
+    assert c.max_value() == 0.0
+    c.inc(2, "a")
+    c.inc(5, "b")
+    c.inc(1, "a")
+    assert c.max_value() == 5.0
+    c.reset("b")
+    assert c.max_value() == 3.0
+    c.reset("a")
+    assert c.max_value() == 0.0
