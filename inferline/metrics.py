@@ -144,6 +144,11 @@ class Histogram:
         with self._lock:
             return list(self._counts)
 
+    def overflow_count(self) -> int:
+        """Observations above the largest finite bucket bound."""
+        with self._lock:
+            return self._counts[-1] - sum(self._counts[:-1])
+
     def reset(self) -> None:
         """Clear every bucket count and the running sum."""
         with self._lock:
