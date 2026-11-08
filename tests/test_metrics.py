@@ -157,3 +157,17 @@ def test_counter_min_value_picks_smallest_label_set():
     assert c.min_value() == 5.0
     c.reset("b")
     assert c.min_value() == 0.0
+
+
+def test_histogram_bucket_counts_track_each_bucket():
+    h = Histogram("bucket_hist", "Histogram for bucket checks.", buckets=(1.0, 2.0))
+    assert h.bucket_counts() == [0, 0, 0]
+    h.observe(0.5)
+    h.observe(1.5)
+    h.observe(5.0)
+    # Each observation lands in the first bucket that covers it; +Inf counts all.
+    assert h.bucket_counts() == [1, 1, 3]
+    # The returned list is a copy, so mutating it cannot corrupt the histogram.
+    counts = h.bucket_counts()
+    counts[0] = 99
+    assert h.bucket_counts() == [1, 1, 3]
