@@ -149,6 +149,25 @@ class Histogram:
         with self._lock:
             return self._counts[-1] - sum(self._counts[:-1])
 
+    def lowest_bucket_count(self) -> int:
+        """Observations that fell into the smallest bucket.
+
+        These are the observations at or below the first bucket bound,
+        the fast end of the distribution for a latency histogram.
+        """
+        with self._lock:
+            return self._counts[0]
+
+    def highest_finite_bucket_count(self) -> int:
+        """Observations that fell into the largest finite bucket.
+
+        These are the observations above the second-largest bound and
+        at or below the largest bound, the slow end of the recorded
+        distribution before the overflow bucket takes over.
+        """
+        with self._lock:
+            return self._counts[-2] if len(self._counts) > 1 else 0
+
     def reset(self) -> None:
         """Clear every bucket count and the running sum."""
         with self._lock:
