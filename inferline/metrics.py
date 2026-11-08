@@ -139,6 +139,11 @@ class Histogram:
         with self._lock:
             return self._sum
 
+    def bucket_counts(self) -> list[int]:
+        """Copy of the per-bucket observation counts; the last slot is +Inf."""
+        with self._lock:
+            return list(self._counts)
+
     def reset(self) -> None:
         """Clear every bucket count and the running sum."""
         with self._lock:
