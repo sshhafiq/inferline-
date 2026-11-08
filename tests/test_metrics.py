@@ -171,3 +171,16 @@ def test_histogram_bucket_counts_track_each_bucket():
     counts = h.bucket_counts()
     counts[0] = 99
     assert h.bucket_counts() == [1, 1, 3]
+
+
+def test_histogram_overflow_count_counts_values_above_top_bucket():
+    h = Histogram("overflow_hist", "Histogram for overflow checks.", buckets=(1.0, 2.0))
+    assert h.overflow_count() == 0
+    h.observe(0.5)
+    h.observe(1.5)
+    assert h.overflow_count() == 0
+    h.observe(5.0)
+    h.observe(9.0)
+    assert h.overflow_count() == 2
+    h.reset()
+    assert h.overflow_count() == 0
