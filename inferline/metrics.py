@@ -53,6 +53,13 @@ class Counter:
         with self._lock:
             return min(self._values.values(), default=0.0)
 
+    def mean_value(self) -> float:
+        """Mean value across every label set, or 0.0 if none recorded."""
+        with self._lock:
+            if not self._values:
+                return 0.0
+            return sum(self._values.values()) / len(self._values)
+
     def render(
         self, label_names: Iterable[str], out: list[str]
     ) -> None:
