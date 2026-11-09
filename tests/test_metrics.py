@@ -184,3 +184,28 @@ def test_histogram_overflow_count_counts_values_above_top_bucket():
     assert h.overflow_count() == 2
     h.reset()
     assert h.overflow_count() == 0
+
+
+def test_histogram_lowest_bucket_count_tracks_fast_observations():
+    h = Histogram("lowest_hist", "Histogram for lowest bucket checks.", buckets=(1.0, 2.0))
+    assert h.lowest_bucket_count() == 0
+    h.observe(0.5)
+    h.observe(1.5)
+    h.observe(0.25)
+    assert h.lowest_bucket_count() == 2
+    h.observe(5.0)
+    assert h.lowest_bucket_count() == 2
+    h.reset()
+    assert h.lowest_bucket_count() == 0
+
+
+def test_histogram_highest_finite_bucket_count_tracks_slow_observations():
+    h = Histogram("highest_hist", "Histogram for highest bucket checks.", buckets=(1.0, 2.0))
+    assert h.highest_finite_bucket_count() == 0
+    h.observe(0.5)
+    h.observe(1.5)
+    assert h.highest_finite_bucket_count() == 1
+    h.observe(5.0)
+    assert h.highest_finite_bucket_count() == 1
+    h.reset()
+    assert h.highest_finite_bucket_count() == 0
