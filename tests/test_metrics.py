@@ -159,6 +159,20 @@ def test_counter_min_value_picks_smallest_label_set():
     assert c.min_value() == 0.0
 
 
+def test_counter_mean_value_averages_label_sets():
+    c = Counter("mean_counter", "A test counter.")
+    assert c.mean_value() == 0.0
+    c.inc(2, "a")
+    c.inc(6, "b")
+    assert c.mean_value() == 4.0
+    c.inc(2, "a")
+    assert c.mean_value() == 5.0
+    c.reset("b")
+    assert c.mean_value() == 4.0
+    c.reset("a")
+    assert c.mean_value() == 0.0
+
+
 def test_histogram_bucket_counts_track_each_bucket():
     h = Histogram("bucket_hist", "Histogram for bucket checks.", buckets=(1.0, 2.0))
     assert h.bucket_counts() == [0, 0, 0]
