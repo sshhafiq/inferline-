@@ -238,3 +238,20 @@ def test_histogram_empty_bucket_count_tracks_unfilled_buckets():
     assert h.empty_bucket_count() == 0
     h.reset()
     assert h.empty_bucket_count() == 3
+
+
+def test_histogram_nonempty_bucket_count_tracks_filled_buckets():
+    h = Histogram("nonempty_hist", "Histogram for nonempty bucket checks.", buckets=(1.0, 2.0, 4.0))
+    assert h.nonempty_bucket_count() == 0
+    h.observe(0.5)
+    assert h.nonempty_bucket_count() == 1
+    h.observe(5.0)
+    # Overflow lands in no finite bucket, so the count is unchanged.
+    assert h.nonempty_bucket_count() == 1
+    h.observe(1.5)
+    h.observe(3.0)
+    assert h.nonempty_bucket_count() == 3
+    # Filled and empty finite buckets always add up to the bucket count.
+    assert h.nonempty_bucket_count() + h.empty_bucket_count() == 3
+    h.reset()
+    assert h.nonempty_bucket_count() == 0
