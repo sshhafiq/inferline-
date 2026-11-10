@@ -175,6 +175,15 @@ class Histogram:
         with self._lock:
             return self._counts[-2] if len(self._counts) > 1 else 0
 
+    def empty_bucket_count(self) -> int:
+        """Number of finite buckets that have recorded no observations.
+
+        The +Inf bucket is not counted: it tracks the total, not a
+        range, so it is empty only when nothing was observed at all.
+        """
+        with self._lock:
+            return sum(1 for c in self._counts[:-1] if c == 0)
+
     def reset(self) -> None:
         """Clear every bucket count and the running sum."""
         with self._lock:
