@@ -223,3 +223,18 @@ def test_histogram_highest_finite_bucket_count_tracks_slow_observations():
     assert h.highest_finite_bucket_count() == 1
     h.reset()
     assert h.highest_finite_bucket_count() == 0
+
+
+def test_histogram_empty_bucket_count_tracks_unfilled_buckets():
+    h = Histogram("empty_hist", "Histogram for empty bucket checks.", buckets=(1.0, 2.0, 4.0))
+    assert h.empty_bucket_count() == 3
+    h.observe(0.5)
+    assert h.empty_bucket_count() == 2
+    h.observe(5.0)
+    # Overflow lands in no finite bucket, so the count is unchanged.
+    assert h.empty_bucket_count() == 2
+    h.observe(1.5)
+    h.observe(3.0)
+    assert h.empty_bucket_count() == 0
+    h.reset()
+    assert h.empty_bucket_count() == 3
