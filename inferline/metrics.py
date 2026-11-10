@@ -184,6 +184,17 @@ class Histogram:
         with self._lock:
             return sum(1 for c in self._counts[:-1] if c == 0)
 
+    def nonempty_bucket_count(self) -> int:
+        """Number of finite buckets that have recorded an observation.
+
+        The complement of :meth:`empty_bucket_count` over the finite
+        buckets: together they always add up to the number of bucket
+        bounds. The +Inf bucket is not counted, for the same reason as
+        there: it tracks the total, not a range.
+        """
+        with self._lock:
+            return sum(1 for c in self._counts[:-1] if c > 0)
+
     def reset(self) -> None:
         """Clear every bucket count and the running sum."""
         with self._lock:
