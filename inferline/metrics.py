@@ -195,6 +195,20 @@ class Histogram:
         with self._lock:
             return sum(1 for c in self._counts[:-1] if c > 0)
 
+    def overflow_share(self) -> float:
+        """Share of observations that overflowed the largest finite bucket.
+
+        Returns 0.0 before any observation. A rising share means the
+        bucket bounds no longer cover the values being observed, which
+        is the signal to widen them.
+        """
+        with self._lock:
+            total = self._counts[-1]
+            if total == 0:
+                return 0.0
+            overflow = total - sum(self._counts[:-1])
+            return overflow / total
+
     def reset(self) -> None:
         """Clear every bucket count and the running sum."""
         with self._lock:
