@@ -255,3 +255,16 @@ def test_histogram_nonempty_bucket_count_tracks_filled_buckets():
     assert h.nonempty_bucket_count() + h.empty_bucket_count() == 3
     h.reset()
     assert h.nonempty_bucket_count() == 0
+
+
+def test_histogram_overflow_share_tracks_overflow_fraction():
+    h = Histogram("overflow_share_hist", "Histogram for overflow share checks.", buckets=(1.0, 2.0, 4.0))
+    assert h.overflow_share() == 0.0
+    h.observe(0.5)
+    assert h.overflow_share() == 0.0
+    h.observe(5.0)
+    assert h.overflow_share() == 0.5
+    h.observe(9.0)
+    assert abs(h.overflow_share() - 2 / 3) < 1e-9
+    h.reset()
+    assert h.overflow_share() == 0.0
