@@ -213,6 +213,15 @@ class Scheduler:
         """
         return [inf.request.prompt for inf in self._pending]
 
+    def pending_max_new_tokens(self) -> int:
+        """Total ``max_new_tokens`` requested by everything in the queue.
+
+        A cheap capacity signal alongside :meth:`pending_prompts`: it
+        shows how much decoding work is already committed before any of
+        it starts, without mutating the queue.
+        """
+        return sum(inf.request.max_new_tokens for inf in self._pending)
+
     def _enqueue(self, request: GenerationRequest) -> _Inflight:
         if self._closed:
             raise RuntimeError("scheduler is closed")
