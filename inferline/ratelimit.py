@@ -70,6 +70,23 @@ class RateLimiter:
         bucket = self._bucket_for(key)
         return bucket.allow(cost=cost)
 
+    def tracked_keys(self) -> list[str]:
+        """Sorted keys that currently have a bucket.
+
+        Handy for admin endpoints and metrics exporters that need to know
+        which clients are being limited without touching bucket state.
+        """
+        with self._lock:
+            return sorted(self._buckets)
+
+    def reset(self, key: str) -> bool:
+        """Drop ``key``'s bucket so its next request starts with a full burst.
+
+        Returns True if a bucket existed, False if the key was never seen.
+        """
+        with self._lock:
+            return self._buckets.pop(key, None) is not None
+
     def _bucket_for(self, key: str) -> TokenBucket:
         with self._lock:
             bucket = self._buckets.get(key)
