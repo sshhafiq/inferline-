@@ -209,6 +209,19 @@ class Histogram:
             overflow = total - sum(self._counts[:-1])
             return overflow / total
 
+    def lowest_bucket_share(self) -> float:
+        """Share of observations that fell into the smallest bucket.
+
+        Returns 0.0 before any observation. For a latency histogram a
+        high share means most requests are landing at the fast end of
+        the recorded range, well under the first bucket bound.
+        """
+        with self._lock:
+            total = self._counts[-1]
+            if total == 0:
+                return 0.0
+            return self._counts[0] / total
+
     def reset(self) -> None:
         """Clear every bucket count and the running sum."""
         with self._lock:
