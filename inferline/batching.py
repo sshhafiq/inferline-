@@ -61,6 +61,16 @@ class BatchingPolicy:
         """Total worst-case tokens a formed batch occupies."""
         return sum(request.token_cost for request in batch)
 
+    def remaining_budget(self, batch: list[QueuedRequest]) -> int:
+        """Tokens left in the per-batch budget after ``batch``.
+
+        Never negative: an oversized request admitted alone (see
+        :meth:`form_batch`) reports zero remaining budget rather than
+        a negative allowance, so callers can use the result directly
+        as the budget for admitting anything else.
+        """
+        return max(0, self.max_tokens_per_batch - self.batch_tokens(batch))
+
     def form_batch(self, queue: list[QueuedRequest]) -> list[QueuedRequest]:
         """Greedily pack the highest-priority requests into one micro-batch.
 
