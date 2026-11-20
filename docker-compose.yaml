@@ -1,0 +1,66 @@
+# inferline app + local Temporal server for the Temporal integration
+# (inferline.temporal). This file is a superset of docker-compose.yml:
+# it keeps the app service and adds Temporal. Usage:
+#
+#   docker compose up -d                       # app + Temporal
+#   docker compose up -d postgresql temporal temporal-ui
+#   python -m inferline.temporal.worker demo
+#
+# Temporal UI: http://localhost:8080  ·  gRPC frontend: localhost:7233
+services:
+  inferline:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # Uncomment to require API keys:
+      # INFERLINE_API_KEYS: "dev-key-1,dev-key-2"
+      INFERLINE_SERVER__PORT: "8000"
+      INFERLINE_SCHEDULER__MAX_TOKENS_PER_BATCH: "2048"
+      INFERLINE_MOCK__LATENCY_PER_TOKEN_MS: "5.0"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  postgresql:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal
+    volumes:
+      - temporal-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  temporal:
+    image: temporalio/auto-setup:latest
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      DB: postgresql
+      DB_PORT: 5432
+      POSTGRES_USER: temporal
+      POSTGRES_PWD: temporal
+      POSTGRES_SEEDS: postgresql
+    ports:
+      - "7233:7233"
+
+  temporal-ui:
+    image: temporalio/ui:latest
+    depends_on:
+      - temporal
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8080:8080"
+
+volumes:
+  temporal-db:
