@@ -21,6 +21,7 @@ test = [
     "pytest>=8.0",
     "pytest-asyncio>=0.23",
 ]
+temporal = ["temporalio>=1.7"]
 
 [tool.setuptools.packages.find]
 include = ["inferline*"]
