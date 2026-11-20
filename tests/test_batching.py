@@ -75,3 +75,15 @@ def test_invalid_policy_rejected():
         BatchingPolicy(max_tokens_per_batch=0)
     with pytest.raises(ValueError):
         BatchingPolicy(max_wait_ms=-1)
+
+
+def test_remaining_budget_counts_down_and_never_goes_negative():
+    policy = BatchingPolicy(max_tokens_per_batch=100)
+    assert policy.remaining_budget([]) == 100
+    batch = [make_request("r0", prompt_tokens=30, max_new_tokens=20)]
+    assert policy.remaining_budget(batch) == 50
+    batch.append(make_request("r1", prompt_tokens=30, max_new_tokens=20))
+    assert policy.remaining_budget(batch) == 0
+    # An oversized request admitted alone clamps at zero, not negative.
+    oversized = [make_request("big", prompt_tokens=150, max_new_tokens=50)]
+    assert policy.remaining_budget(oversized) == 0
