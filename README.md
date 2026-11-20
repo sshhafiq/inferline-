@@ -147,3 +147,33 @@ loadtest/load.py # asyncio load generator
 python -m pytest          # all tests
 python -m pytest tests/test_scheduler.py -v
 ```
+
+## Temporal integration (`inferline.temporal`)
+
+The HTTP server serves requests in-process. For offline batch jobs —
+hundreds of prompts under one policy and tenant — `inferline.temporal`
+runs the same stack as a durable Temporal workflow:
+
+```
+BatchInferenceWorkflow
+  ├─ shards requests (count + token-budget packing, the
+  │   BatchingPolicy cost model)
+  ├─ run_inference_shard activities in parallel waves
+  │    (per-tenant RateLimiter admission → Scheduler with
+  │     continuous batching → MetricsRegistry slice,
+  │     heartbeating while generation is in flight)
+  ├─ `cancel_job` signal, honoured between waves: unstarted
+  │   shards never run and partial results are returned
+  └─ `progress` query for live counts
+```
+
+```bash
+pip install "inferline[temporal]"
+docker compose up -d postgresql temporal temporal-ui   # local Temporal
+python -m inferline.temporal.worker worker
+python -m inferline.temporal.worker demo --prompts 24
+```
+
+`docker-compose.yaml` in this repo is a superset of
+`docker-compose.yml`: it keeps the app service and adds the Temporal
+stack.
