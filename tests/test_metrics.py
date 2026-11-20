@@ -268,3 +268,16 @@ def test_histogram_overflow_share_tracks_overflow_fraction():
     assert abs(h.overflow_share() - 2 / 3) < 1e-9
     h.reset()
     assert h.overflow_share() == 0.0
+
+
+def test_histogram_lowest_bucket_share_tracks_fast_fraction():
+    h = Histogram("lowest_share_hist", "Histogram for lowest share checks.", buckets=(1.0, 2.0, 4.0))
+    assert h.lowest_bucket_share() == 0.0
+    h.observe(0.5)
+    assert h.lowest_bucket_share() == 1.0
+    h.observe(5.0)
+    assert h.lowest_bucket_share() == 0.5
+    h.observe(1.5)
+    assert abs(h.lowest_bucket_share() - 1 / 3) < 1e-9
+    h.reset()
+    assert h.lowest_bucket_share() == 0.0
