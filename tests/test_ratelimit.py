@@ -55,3 +55,22 @@ def test_invalid_parameters():
         TokenBucket(rate=0, capacity=1)
     with pytest.raises(ValueError):
         TokenBucket(rate=1, capacity=0)
+
+def test_limiter_reset_restores_full_burst():
+    limiter = RateLimiter(rate=1.0, burst=1)
+    assert limiter.allow("alice")
+    assert not limiter.allow("alice")
+    assert limiter.reset("alice")
+    assert limiter.allow("alice")
+    assert not limiter.reset("nobody")
+
+
+def test_tracked_keys_lists_seen_keys_sorted():
+    limiter = RateLimiter(rate=1.0, burst=2)
+    assert limiter.tracked_keys() == []
+    limiter.allow("bob")
+    limiter.allow("alice")
+    limiter.allow("bob")
+    assert limiter.tracked_keys() == ["alice", "bob"]
+    limiter.reset("alice")
+    assert limiter.tracked_keys() == ["bob"]
