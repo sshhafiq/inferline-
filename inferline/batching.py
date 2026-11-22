@@ -71,6 +71,13 @@ class BatchingPolicy:
         """
         return max(0, self.max_tokens_per_batch - self.batch_tokens(batch))
 
+    def count_by_priority(self, queue: list[QueuedRequest]) -> dict[Priority, int]:
+        """Count queued requests per priority lane (empty lanes omitted)."""
+        counts: dict[Priority, int] = {}
+        for request in queue:
+            counts[request.priority] = counts.get(request.priority, 0) + 1
+        return counts
+
     def form_batch(self, queue: list[QueuedRequest]) -> list[QueuedRequest]:
         """Greedily pack the highest-priority requests into one micro-batch.
 
