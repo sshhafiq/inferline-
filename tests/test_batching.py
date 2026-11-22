@@ -87,3 +87,17 @@ def test_remaining_budget_counts_down_and_never_goes_negative():
     # An oversized request admitted alone clamps at zero, not negative.
     oversized = [make_request("big", prompt_tokens=150, max_new_tokens=50)]
     assert policy.remaining_budget(oversized) == 0
+
+
+def test_count_by_priority_tallies_lanes():
+    policy = BatchingPolicy()
+    queue = [
+        make_request("r0"),
+        make_request("r1", priority=Priority.INTERACTIVE),
+        make_request("r2", priority=Priority.INTERACTIVE),
+    ]
+    assert policy.count_by_priority(queue) == {
+        Priority.BATCH: 1,
+        Priority.INTERACTIVE: 2,
+    }
+    assert policy.count_by_priority([]) == {}
