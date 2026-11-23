@@ -72,6 +72,11 @@ class Settings(BaseModel):
         description="Accepted Bearer API keys. Empty means auth is disabled.",
     )
 
+    @property
+    def auth_enabled(self) -> bool:
+        """True when at least one API key is configured."""
+        return bool(self.api_keys)
+
     @classmethod
     def load(cls, path: str | Path | None = None) -> "Settings":
         """Load settings from an optional YAML file plus environment overrides."""
