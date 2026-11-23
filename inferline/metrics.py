@@ -209,6 +209,31 @@ class Histogram:
             overflow = total - sum(self._counts[:-1])
             return overflow / total
 
+    def highest_finite_bucket_share(self) -> float:
+        """Share of observations in the largest finite bucket.
+
+        Returns 0.0 before any observation is recorded.
+        """
+        with self._lock:
+            total = self._counts[-1]
+            if total == 0 or len(self._counts) < 2:
+                return 0.0
+            return self._counts[-2] / total
+
+    def finite_share(self) -> float:
+        """Share of observations inside the finite buckets.
+
+        The complement of :meth:`overflow_share`: together they always
+        add up to 1.0 once anything has been observed. Returns 0.0
+        before any observation. A falling share means more values are
+        escaping the recorded range into the overflow bucket.
+        """
+        with self._lock:
+            total = self._counts[-1]
+            if total == 0:
+                return 0.0
+            return sum(self._counts[:-1]) / total
+
     def lowest_bucket_share(self) -> float:
         """Share of observations that fell into the smallest bucket.
 
