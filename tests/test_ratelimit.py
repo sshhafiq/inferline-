@@ -74,3 +74,25 @@ def test_tracked_keys_lists_seen_keys_sorted():
     assert limiter.tracked_keys() == ["alice", "bob"]
     limiter.reset("alice")
     assert limiter.tracked_keys() == ["bob"]
+
+
+def test_available_fraction_tracks_remaining_burst():
+    import pytest
+
+    bucket = TokenBucket(rate=0.001, capacity=4)
+    assert bucket.available_fraction() == pytest.approx(1.0)
+    assert bucket.allow(cost=3)
+    assert bucket.available_fraction() == pytest.approx(0.25)
+    assert bucket.allow(cost=1)
+    assert bucket.available_fraction() == pytest.approx(0.0, abs=1e-6)
+
+
+def test_tracked_key_count_counts_seen_keys():
+    limiter = RateLimiter(rate=1.0, burst=2)
+    assert limiter.tracked_key_count() == 0
+    limiter.allow("bob")
+    limiter.allow("alice")
+    limiter.allow("bob")
+    assert limiter.tracked_key_count() == 2
+    limiter.reset("alice")
+    assert limiter.tracked_key_count() == 1
