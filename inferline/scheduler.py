@@ -222,6 +222,14 @@ class Scheduler:
         """
         return sum(inf.request.max_new_tokens for inf in self._pending)
 
+    def pending_request_ids(self) -> list[str]:
+        """Request ids currently waiting for a batch, in queue order.
+
+        Pairs with :meth:`pending_prompts` for log correlation: prompts
+        are human-readable, ids are what backend logs reference.
+        """
+        return [inf.request.request_id for inf in self._pending]
+
     def _enqueue(self, request: GenerationRequest) -> _Inflight:
         if self._closed:
             raise RuntimeError("scheduler is closed")
