@@ -48,6 +48,15 @@ class TokenBucket:
             self._updated = now
             return self._tokens
 
+    def available_fraction(self) -> float:
+        """Share of the burst capacity currently available, 0.0 to 1.0.
+
+        A normalized form of :attr:`tokens`: 1.0 on a fresh bucket and
+        0.0 right after the full burst is spent, so dashboards can show
+        headroom without knowing each key's configured capacity.
+        """
+        return self.tokens / self.capacity
+
 
 class RateLimiter:
     """Manages one :class:`TokenBucket` per key, created lazily."""
@@ -78,6 +87,16 @@ class RateLimiter:
         """
         with self._lock:
             return sorted(self._buckets)
+
+    def tracked_key_count(self) -> int:
+        """Number of keys that currently have a bucket.
+
+        The count companion to :meth:`tracked_keys`, for metrics and
+        health checks that only need how many clients are being limited,
+        not their names.
+        """
+        with self._lock:
+            return len(self._buckets)
 
     def reset(self, key: str) -> bool:
         """Drop ``key``'s bucket so its next request starts with a full burst.
