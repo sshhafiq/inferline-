@@ -281,3 +281,27 @@ def test_histogram_lowest_bucket_share_tracks_fast_fraction():
     assert abs(h.lowest_bucket_share() - 1 / 3) < 1e-9
     h.reset()
     assert h.lowest_bucket_share() == 0.0
+
+
+def test_histogram_finite_share_complements_overflow_share():
+    h = Histogram("finite_share_hist", "Histogram for finite share checks.", buckets=(1.0, 2.0, 4.0))
+    assert h.finite_share() == 0.0
+    h.observe(0.5)
+    assert h.finite_share() == 1.0
+    h.observe(5.0)
+    assert h.finite_share() == 0.5
+    assert h.finite_share() + h.overflow_share() == 1.0
+    h.observe(9.0)
+    assert abs(h.finite_share() - 1 / 3) < 1e-9
+    h.reset()
+    assert h.finite_share() == 0.0
+
+
+def test_histogram_highest_finite_bucket_share():
+    hist = Histogram("lat", "latency", buckets=[0.1, 0.5, 1.0])
+    assert hist.highest_finite_bucket_share() == 0.0
+    hist.observe(0.05)
+    hist.observe(0.75)
+    hist.observe(0.9)
+    hist.observe(2.0)
+    assert hist.highest_finite_bucket_share() == 0.5
