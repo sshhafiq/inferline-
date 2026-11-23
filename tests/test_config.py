@@ -55,3 +55,8 @@ def test_env_beats_yaml(tmp_path, monkeypatch):
 def test_missing_file_raises():
     with pytest.raises(FileNotFoundError):
         Settings.load("/does/not/exist.yaml")
+
+
+def test_auth_enabled_reflects_api_keys():
+    assert Settings().auth_enabled is False
+    assert Settings(api_keys=["secret"]).auth_enabled is True
