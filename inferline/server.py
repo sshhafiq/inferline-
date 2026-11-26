@@ -114,6 +114,14 @@ def render_prompt(messages: list[ChatMessage]) -> str:
     return "\n".join(f"{m.role}: {m.content}" for m in messages)
 
 
+def count_message_roles(messages: list[ChatMessage]) -> dict[str, int]:
+    """Count chat messages per role, for request logging and debugging."""
+    counts: dict[str, int] = {}
+    for m in messages:
+        counts[m.role] = counts.get(m.role, 0) + 1
+    return counts
+
+
 def _new_id(prefix: str) -> str:
     return f"{prefix}-{uuid.uuid4().hex[:12]}"
 
